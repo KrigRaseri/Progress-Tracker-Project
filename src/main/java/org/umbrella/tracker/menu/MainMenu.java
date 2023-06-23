@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MainMenu {
+    public static List<Student> studentList = new ArrayList<>();
 
     public void runMenu() {
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
@@ -32,7 +33,6 @@ public class MainMenu {
     }
 
     private void addStudents(BufferedReader reader) throws IOException {
-        List<Student> studentList = new ArrayList<>();
         System.out.println("Enter student credentials or 'back' to return");
         String input;
 
