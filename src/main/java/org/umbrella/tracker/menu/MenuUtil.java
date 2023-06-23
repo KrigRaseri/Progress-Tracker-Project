@@ -29,12 +29,26 @@ public class MenuUtil {
 
     // ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$
     public static boolean emailCheck(@NotNull String email) {
+        if (!isEmailUnique(email)) {
+            System.out.println("This email is already taken.");
+        }
+
         String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z0-9]+$";
         if (!email.matches(emailRegex)) {
             System.out.println("Incorrect email.");
             return false;
         }
         return true;
+    }
+
+    /***
+     * Checks if email is unique.
+     * @param email String email.
+     * @return boolean.
+     */
+    private static boolean isEmailUnique(@NotNull String email) {
+        List<Student> studentList = new ArrayList<>(MainMenu.studentList);
+        return studentList.stream().noneMatch(student -> student.getEmail().equals(email));
     }
 
     /***
