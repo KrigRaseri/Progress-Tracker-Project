@@ -1,15 +1,16 @@
 package org.umbrella.tracker.menu;
 
 import org.jetbrains.annotations.NotNull;
-import org.umbrella.tracker.Student;
+import org.umbrella.tracker.student.Student;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 public class MenuUtil {
 
-    public static boolean firstNameCheck(@NotNull String name) {
+    static boolean firstNameCheck(@NotNull String name) {
         String nameRegex = "^[A-Za-z]+[-']?[A-Za-z]+";
         if (!name.matches(nameRegex)) {
             System.out.println("Incorrect first name.");
@@ -18,7 +19,12 @@ public class MenuUtil {
         return true;
     }
 
-    public static boolean lastNameCheck(@NotNull String name) {
+    /***
+     * Checks if last name is valid.
+     * @param name String last name.
+     * @return boolean.
+     */
+    static boolean lastNameCheck(@NotNull String name) {
         String nameRegex = "^[A-Za-z]{2,}(([\\s-'][A-Za-z]+)?)+|[A-Za-z]+[-'][A-Za-z]+";
         if (!name.matches(nameRegex)) {
             System.out.println("Incorrect last name.");
@@ -28,11 +34,12 @@ public class MenuUtil {
     }
 
     // ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$
-    public static boolean emailCheck(@NotNull String email) {
-        if (!isEmailUnique(email)) {
-            System.out.println("This email is already taken.");
-        }
-
+    /***
+     * Checks if email is valid and unique.
+     * @param email String email.
+     * @return boolean.
+     */
+    static boolean emailCheck(@NotNull String email) {
         String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z0-9]+$";
         if (!email.matches(emailRegex)) {
             System.out.println("Incorrect email.");
@@ -46,8 +53,7 @@ public class MenuUtil {
      * @param email String email.
      * @return boolean.
      */
-    private static boolean isEmailUnique(@NotNull String email) {
-        List<Student> studentList = new ArrayList<>(MainMenu.studentList);
+    private static boolean isEmailUnique(@NotNull String email, @NotNull List<Student> studentList) {
         return studentList.stream().noneMatch(student -> student.getEmail().equals(email));
     }
 
@@ -56,7 +62,7 @@ public class MenuUtil {
      * @param input String array of student credentials.
      * @return Optional of Student object.
      */
-    public static Optional<Student> inputValidator(String @NotNull [] input) {
+    public static Optional<Student> inputValidator(String @NotNull [] input, List<Student> studentList) {
         String firstName;
         String lastName;
         String email;
@@ -74,9 +80,34 @@ public class MenuUtil {
         nameParts.remove(nameParts.size()-1);
         lastName = String.join(" ", nameParts);
 
+        if (!isEmailUnique(email, studentList)) {
+            System.out.println("This email is already taken.");
+            return Optional.empty();
+        }
+
         if (!lastNameCheck(lastName) || !emailCheck(email) || !firstNameCheck(firstName)) {
             return Optional.empty();
         }
         return Optional.of(new Student(firstName, lastName, email));
+    }
+
+    /***
+     * Checks if id is present in student list.
+     * @param id String id.
+     * @param studentList List of Student objects.
+     * @return boolean.
+     */
+    public static boolean isIdPresent(String id, List<Student> studentList) {
+        try {
+            int stuID = Integer.parseInt(id);
+            Optional<Student> optStudent = studentList.stream()
+                    .filter(student -> student.getId() == stuID)
+                    .findFirst();
+
+            return optStudent.isPresent();
+        } catch (NumberFormatException e) {
+            System.out.println("Error: invalid id!");
+            return false;
+        }
     }
 }
