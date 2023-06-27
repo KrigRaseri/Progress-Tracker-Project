@@ -6,7 +6,8 @@ import org.umbrella.tracker.menu.MainMenu;
 
 public class ProgressTrackerMain {
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector();
+        GuiceConfig guiceConfig = new GuiceConfig();
+        Injector injector = Guice.createInjector(guiceConfig);
         MainMenu mainMenu = injector.getInstance(MainMenu.class);
 
         mainMenu.runMenu();
