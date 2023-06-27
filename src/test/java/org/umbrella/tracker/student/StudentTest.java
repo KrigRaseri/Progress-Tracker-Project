@@ -19,6 +19,9 @@ class StudentTest {
         student = new Student("John", "Doe", "jonD@goopy.com");
     }
 
+    /**
+     * Method under test: {@link Student#displayStudentInfo()}
+     * */
     @Test
     void testDisplayStudentInfo_correct() {
         // Arrange
@@ -45,13 +48,13 @@ class StudentTest {
 
 //61682 points: Java=90; DSA=85; Databases=75; Spring=80
     @Test
-    void testEquals() {
+    void equals_isEqual() {
         Student student2 = new Student("John", "Doe", "jonD@goopy.com");
         assertThat(student).isEqualTo(student2);
     }
 
     @Test
-    void testNotEquals() {
+    void equals_notEqual() {
         Student student2 = new Student("Jane", "Doe", "jonD@goopy.com");
         assertThat(student).isNotEqualTo(student2);
     }
