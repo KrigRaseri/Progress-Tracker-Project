@@ -6,9 +6,20 @@ import org.umbrella.tracker.menu.MenuUtil;
 
 import java.util.*;
 
-
 public class StudentServiceImpl implements StudentService {
-    private static Map<Integer, Student> studentMap = new HashMap<>();
+    private Map<Integer, Student> studentMap = new HashMap<>();
+
+    public Map<Integer, Student> getStudentMap() {
+        return Collections.unmodifiableMap(studentMap);
+    }
+
+    public void putStudentMap(int id, Student student) {
+        this.studentMap.put(id, student);
+    }
+
+    public void replaceStudentMap(int id, Student student) {
+        this.studentMap.replace(id, student);
+    }
 
     @Override
     public String addPoints(@NotNull List<String> inputSections) {
@@ -21,15 +32,15 @@ public class StudentServiceImpl implements StudentService {
 
 
             if (javaPoints < 0 || dsaPoints < 0 || databasesPoints < 0 || springPoints < 0) {
-                return "Incorrect points format.";
+                return "Points cannot be negative.";
             }
 
-            Student student = studentMap.get(id);
+            Student student = getStudentMap().get(id);
             student.setDatabases(student.getDatabases() + databasesPoints);
             student.setDsa(student.getDsa() + dsaPoints);
             student.setJava(student.getJava() + javaPoints);
             student.setSpring(student.getSpring() + springPoints);
-            studentMap.replace(id, student);
+            replaceStudentMap(id, student);
             return "Points updated.";
 
         } catch (NumberFormatException e) {
@@ -42,24 +53,20 @@ public class StudentServiceImpl implements StudentService {
         Optional<Student> student = MenuUtil.inputValidator(studentInput, getStudentsFromMap());
         student.ifPresent(stu -> {
             stu.setId(Math.abs(stu.hashCode() % 100000));
-            studentMap.put(Math.abs(stu.hashCode() % 100000), stu);
+            putStudentMap(Math.abs(stu.hashCode() % 100000), stu);
             System.out.println("The student has been added.");
         });
     }
 
     @Override
-    public void findStudent(int id) throws NumberFormatException {
-        try {
-            Optional<Map.Entry<Integer, Student>> s = studentMap.entrySet().stream()
-                    .filter(e -> e.getKey() == id).findFirst();
+    public void findStudent(int id) {
+        Optional<Map.Entry<Integer, Student>> s = studentMap.entrySet().stream()
+                .filter(e -> e.getKey() == id).findFirst();
 
-            if (s.isPresent()) {
-                s.get().getValue().displayStudentInfo();
-            } else {
-                System.out.printf("No student is found for id=%d\n", id);
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Error: invalid id!");
+        if (s.isPresent()) {
+            s.get().getValue().displayStudentInfo();
+        } else {
+            System.out.printf("No student is found for id=%d\n", id);
         }
     }
 
@@ -69,16 +76,16 @@ public class StudentServiceImpl implements StudentService {
             System.out.println("No students found");
         } else {
             System.out.println("Students:");
-            studentMap.values().stream().map(Student::getId).forEach(System.out::println);
+            getStudentMap().values().stream().map(Student::getId).forEach(System.out::println);
         }
     }
 
     @Contract(" -> new")
     public @NotNull List<Student> getStudentsFromMap() {
-        return new ArrayList<>(studentMap.values());
+        return new ArrayList<>(getStudentMap().values());
     }
 
     public int mapSize() {
-        return studentMap.size();
+        return getStudentMap().size();
     }
 }
