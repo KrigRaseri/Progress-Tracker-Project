@@ -21,6 +21,10 @@ public class StudentServiceImpl implements StudentService {
         this.studentMap.replace(id, student);
     }
 
+    /***
+     * Returns a list of students from the studentMap.
+     * @return List<Student>.
+     */
     @Override
     public String addPoints(@NotNull List<String> inputSections) {
         try {
@@ -48,6 +52,10 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    /***
+     * Adds a student to the studentMap.
+     * @param studentInput String[].
+     */
     @Override
     public void addStudents(String[] studentInput) {
         Optional<Student> student = MenuUtil.inputValidator(studentInput, getStudentsFromMap());
@@ -58,6 +66,10 @@ public class StudentServiceImpl implements StudentService {
         });
     }
 
+    /***
+     * Finds a student by id then displays the student info.
+     * @param id int.
+     */
     @Override
     public void findStudent(int id) {
         Optional<Map.Entry<Integer, Student>> s = studentMap.entrySet().stream()
@@ -70,6 +82,9 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    /***
+     * Lists students out from the map based on ID.
+     */
     @Override
     public void listStudents() {
         if (studentMap.isEmpty()) {
@@ -79,6 +94,7 @@ public class StudentServiceImpl implements StudentService {
             getStudentMap().values().stream().map(Student::getId).forEach(System.out::println);
         }
     }
+
 
     @Contract(" -> new")
     public @NotNull List<Student> getStudentsFromMap() {
