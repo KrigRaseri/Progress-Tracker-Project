@@ -31,7 +31,7 @@ public class StudentServiceImplTest {
     }
 
     @Test
-    void addStudentsCorrect() {
+    void addStudents_ShouldAddStudent_WhenInputIsCorrect() {
         // Act
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(outputStream);
@@ -49,7 +49,7 @@ public class StudentServiceImplTest {
     }
 
     @Test
-    void addPointsCorrect() {
+    void addPoints_ShouldUpdatePoints_WhenInputIsCorrect() {
         // Arrange
         when(studentMap.get(1)).thenReturn(new Student("John", "Doe", "JDoe@boring.com"));
         String expectedOutput = "Points updated.";
@@ -61,7 +61,7 @@ public class StudentServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("inputListsIncorrect_Negative")
-    void addPointsIncorrect(List<String> inputList) {
+    void addPoints_ShouldReturnErrorMessage_WhenPointsAreNegative(List<String> inputList) {
         // Arrange
         String expectedOutput = "Points cannot be negative.";
         // Act
@@ -81,7 +81,7 @@ public class StudentServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("inputListsIncorrect_NotInteger")
-    void addPointsIncorrect_NotInteger(List<String> inputList) {
+    void addPoints_ShouldReturnErrorMessage_WhenPointsAreNotInteger(List<String> inputList) {
         // Arrange
         String expectedOutput = "Incorrect points format.";
         // Act
@@ -103,7 +103,7 @@ public class StudentServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("findStudentCorrectList")
-    void findStudentCorrect(int id, Student student) {
+    void findStudent_ShouldDisplayStudentInfo_WhenStudentExists(int id, Student student) {
         // Arrange
         when(studentMap.entrySet()).thenReturn(Set.of(Map.entry(id, student)));
         String expectedOutput = String.format("%d points: Java=0; DSA=0; Databases=0; Spring=0", id);
@@ -144,7 +144,7 @@ public class StudentServiceImplTest {
 
 
     @Test
-    void findStudentNotFound() {
+    void findStudent_ShouldDisplayErrorMessage_WhenStudentDoesNotExist() {
         // Arrange
         String expectedOutput = String.format("No student is found for id=%d", 5);
 
@@ -163,7 +163,7 @@ public class StudentServiceImplTest {
     }
 
     @Test
-    void listStudentsWhenEmpty() {
+    void listStudents_ShouldDisplayNoStudentsFound_WhenStudentMapIsEmpty() {
         // Arrange
         when(studentMap.isEmpty()).thenReturn(true);
         String expectedOutput = "No students found";
