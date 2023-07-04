@@ -1,5 +1,7 @@
 package org.umbrella.tracker.menu;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.umbrella.tracker.student.Student;
 
@@ -7,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MenuUtil {
 
     static boolean firstNameCheck(@NotNull String name) {
@@ -89,25 +91,5 @@ public class MenuUtil {
             return Optional.empty();
         }
         return Optional.of(new Student(firstName, lastName, email));
-    }
-
-    /***
-     * Checks if id is present in student list.
-     * @param id String id.
-     * @param studentList List of Student objects.
-     * @return boolean.
-     */
-    public static boolean isIdPresent(String id, List<Student> studentList) {
-        try {
-            int stuID = Integer.parseInt(id);
-            Optional<Student> optStudent = studentList.stream()
-                    .filter(student -> student.getId() == stuID)
-                    .findFirst();
-
-            return optStudent.isPresent();
-        } catch (NumberFormatException e) {
-            System.out.println("Error: invalid id!");
-            return false;
-        }
     }
 }
