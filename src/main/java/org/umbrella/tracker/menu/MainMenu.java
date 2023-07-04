@@ -4,7 +4,9 @@ import com.google.inject.Inject;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.umbrella.tracker.student.StudentServiceImpl;
+import org.apache.logging.log4j.Logger;
+import org.umbrella.tracker.student.StudentService;
+import org.umbrella.tracker.student.StudentStatistics;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,42 +14,88 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The MainMenu class represents the main menu of the Learning Progress Tracker.
+ * It provides various options for interacting with the student data and statistics.
+ */
 @AllArgsConstructor(onConstructor = @__({@Inject}))
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MainMenu {
-    private StudentServiceImpl studentService;
+    private StudentService studentService;
+    private StudentStatistics studentStatisticsImpl;
+    private Logger LOGGER;
 
+    /**
+     * Starts the main menu and handles user interactions.
+     */
     public void runMenu() {
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            System.out.println("Learning Progress Tracker");
+            LOGGER.info("Learning Progress Tracker");
 
             while (true) {
                 String input = reader.readLine().toLowerCase().trim();
+                LOGGER.info("Received input: {}", input);
                 switch (input) {
                     case "add students" -> addStudents(reader);
                     case "list" -> studentService.listStudents();
                     case "find" -> findStudent(reader);
                     case "add points" -> addPoints(reader);
-                    case "back" -> System.out.println("Enter 'exit' to exit the program.");
+                    case "statistics" -> statistics(reader);
+                    case "back" -> LOGGER.info("Enter 'exit' to exit the program.");
                     case "exit" -> Runtime.getRuntime().halt(0);
-                    case "" -> System.out.println("No input.");
-                    default -> System.out.println("Error: unknown command!");
+                    case "" -> LOGGER.info("No input.");
+                    default -> LOGGER.error("Error: unknown command!");
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Error reading input.", e);
+            throw new RuntimeException("Error reading input.", e);
         } finally {
-            System.out.println("bye");
+            LOGGER.info("bye");
         }
     }
 
     /**
-     * Adds points to a student. Enter id and points separated by a space.
+     * Displays the statistics menu and handles user interactions for course selection.
+     *
+     * @param reader the BufferedReader for reading user input.
      */
-    private void addPoints(BufferedReader reader) {
+    private void statistics(BufferedReader reader) {
+        try {
+            LOGGER.info("Type the name of a course to see details or 'back' to quit:");
+            studentStatisticsImpl.printStatistics();
+            String input;
+
+            while (true) {
+                input = reader.readLine().toLowerCase().trim();
+                if (input.equals("back")) {
+                    break;
+                }
+
+                switch (input) {
+                    case "java" -> studentStatisticsImpl.displayCourseInfo("Java");
+                    case "dsa" -> studentStatisticsImpl.displayCourseInfo("DSA");
+                    case "databases" -> studentStatisticsImpl.displayCourseInfo("Databases");
+                    case "spring" -> studentStatisticsImpl.displayCourseInfo("Spring");
+                    default -> LOGGER.error("Error: unknown command!");
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error reading input.", e);
+            throw new RuntimeException("Error reading input.", e);
+        }
+    }
+
+    /**
+     * Handles adding points to student records based on user input.
+     *
+     * @param reader the BufferedReader for reading user input.
+     * @throws IOException if an error occurs while reading input.
+     */
+    private void addPoints(BufferedReader reader) throws IOException {
         List<String> inputSections;
         try {
-            System.out.println("Enter an id and points or 'back' to return:");
+            LOGGER.info("Enter an id and points or 'back' to return:");
             String input;
 
             while(true) {
@@ -58,26 +106,32 @@ public class MainMenu {
                 }
 
                 inputSections = Arrays.asList(input.split(" "));
-
                 if (inputSections.size() != 5) {
-                    System.out.println("Incorrect points format.");
+                    LOGGER.error("Incorrect points format.");
                     continue;
 
-                } else if (!MenuUtil.isIdPresent(inputSections.get(0), studentService.getStudentsFromMap())) {
-                    System.out.printf("No student is found for id=%s\n", inputSections.get(0));
+                } else if (!studentService.isIdPresent(inputSections.get(0))) {
+                    LOGGER.error("No student is found for id={}", inputSections.get(0));
                     continue;
                 }
-
-                System.out.println(studentService.addPoints(inputSections));
+                LOGGER.info(studentService.addPoints(inputSections));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Error reading input.", e);
+            throw new RuntimeException("Error reading input.", e);
         }
     }
 
-    private void findStudent(BufferedReader reader) {
+    /**
+     * Handles finding a student by their ID based on user input.
+     *
+     * @param reader the BufferedReader for reading user input.
+     * @throws IOException if an error occurs while reading input.
+     * @throws NumberFormatException if the input is not a number.
+     */
+    private void findStudent(BufferedReader reader) throws IOException, NumberFormatException {
         try {
-            System.out.println("Enter an id or 'back' to return:");
+            LOGGER.info("Enter an id or 'back' to return:");
             String input;
 
             while (true) {
@@ -88,14 +142,21 @@ public class MainMenu {
                 studentService.findStudent(Integer.parseInt(input));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Error reading input.", e);
+            throw new RuntimeException("Error reading input.", e);
         } catch (NumberFormatException e) {
-            System.out.println("Error: invalid id!");
+            LOGGER.error("Error: invalid id!");
         }
     }
 
+    /**
+     * Handles adding multiple students based on user input.
+     *
+     * @param reader the BufferedReader for reading user input.
+     * @throws IOException if an error occurs while reading input.
+     */
     private void addStudents(BufferedReader reader) throws IOException {
-        System.out.println("Enter student credentials or 'back' to return");
+        LOGGER.info("Enter student credentials or 'back' to return");
         String input;
 
         while(true) {
@@ -106,7 +167,7 @@ public class MainMenu {
             String[] studentInput = input.split(" ");
             studentService.addStudents(studentInput);
         }
-        System.out.printf("Total %d students have been added.\n", studentService.mapSize());
+        LOGGER.info("Total {} students have been added.", studentService.getStudentMapCopy().size());
     }
 }
 
