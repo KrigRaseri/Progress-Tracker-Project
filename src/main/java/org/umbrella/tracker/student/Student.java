@@ -6,6 +6,7 @@ import java.util.*;
 
 @Data
 @RequiredArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class Student {
     @NonNull private final String firstName;
