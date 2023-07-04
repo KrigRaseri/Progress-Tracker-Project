@@ -1,25 +1,21 @@
 package org.umbrella.tracker.student;
 
-import org.jetbrains.annotations.Contract;
+import com.google.inject.Inject;
+import lombok.*;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.umbrella.tracker.menu.MenuUtil;
 
 import java.util.*;
 
+@Getter
+@Setter
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class StudentServiceImpl implements StudentService {
+
+    @NonNull private final Logger LOGGER;
     private Map<Integer, Student> studentMap = new HashMap<>();
-
-    public Map<Integer, Student> getStudentMap() {
-        return Collections.unmodifiableMap(studentMap);
-    }
-
-    public void putStudentMap(int id, Student student) {
-        this.studentMap.put(id, student);
-    }
-
-    public void replaceStudentMap(int id, Student student) {
-        this.studentMap.replace(id, student);
-    }
 
     /***
      * Returns a list of students from the studentMap.
@@ -39,12 +35,12 @@ public class StudentServiceImpl implements StudentService {
                 return "Points cannot be negative.";
             }
 
-            Student student = getStudentMap().get(id);
+            Student student = getStudentMapCopy().get(id);
             student.setDatabases(student.getDatabases() + databasesPoints);
             student.setDsa(student.getDsa() + dsaPoints);
             student.setJava(student.getJava() + javaPoints);
             student.setSpring(student.getSpring() + springPoints);
-            replaceStudentMap(id, student);
+            studentMap.replace(id, student);
             return "Points updated.";
 
         } catch (NumberFormatException e) {
@@ -58,12 +54,33 @@ public class StudentServiceImpl implements StudentService {
      */
     @Override
     public void addStudents(String[] studentInput) {
-        Optional<Student> student = MenuUtil.inputValidator(studentInput, getStudentsFromMap());
+        Optional<Student> student = MenuUtil.inputValidator(studentInput, new ArrayList<>(getStudentMapCopy().values()));
         student.ifPresent(stu -> {
             stu.setId(Math.abs(stu.hashCode() % 100000));
-            putStudentMap(Math.abs(stu.hashCode() % 100000), stu);
+            studentMap.put(Math.abs(stu.hashCode() % 100000), stu);
             System.out.println("The student has been added.");
         });
+    }
+
+    /***
+     * Checks if id is present in student list.
+     * @param id String student ID.
+     * @return boolean.
+     */
+    @Override
+    public boolean isIdPresent(String id) {
+        List<Student> studentList = new ArrayList<>(getStudentMapCopy().values());
+        try {
+            int stuID = Integer.parseInt(id);
+            Optional<Student> optStudent = studentList.stream()
+                    .filter(student -> student.getId() == stuID)
+                    .findFirst();
+
+            return optStudent.isPresent();
+        } catch (NumberFormatException e) {
+            System.out.println("Error: invalid id!");
+            return false;
+        }
     }
 
     /***
@@ -85,23 +102,17 @@ public class StudentServiceImpl implements StudentService {
     /***
      * Lists students out from the map based on ID.
      */
-    @Override
     public void listStudents() {
         if (studentMap.isEmpty()) {
             System.out.println("No students found");
         } else {
             System.out.println("Students:");
-            getStudentMap().values().stream().map(Student::getId).forEach(System.out::println);
+            getStudentMapCopy().values().stream().map(Student::getId).forEach(System.out::println);
         }
     }
 
-
-    @Contract(" -> new")
-    public @NotNull List<Student> getStudentsFromMap() {
-        return new ArrayList<>(getStudentMap().values());
-    }
-
-    public int mapSize() {
-        return getStudentMap().size();
+    @Override
+    public Map<Integer, Student> getStudentMapCopy() {
+        return Collections.unmodifiableMap(studentMap);
     }
 }
