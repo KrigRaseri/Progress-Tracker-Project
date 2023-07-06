@@ -57,14 +57,6 @@ public class StudentStatisticsImpl implements StudentStatistics{
     protected void calculateStatistics() {
         studentMap = new HashMap<>(studentService.getStudentMapCopy());
 
-        /*studentMap = Map.of(
-                1, new Student("jOE", "jo", "joejo@star.yare",
-                        1, 50, 50, 0, 0),
-                2, new Student("Sol", "aire", "praise@sun.com",
-                        2, 60, 1, 0, 0),
-                3, new Student("Art", "Orias", "ofthe@abyss.com",
-                        3, 70, 1, 0, 0));*/
-
         mostPopular = calculatePopularCourses(studentMap, true);
         leastPopular = calculatePopularCourses(studentMap, false);
         highestActivity = calculateCourseActivity(studentMap, true);
