@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.Logger;
+import org.umbrella.tracker.student.StudentNotificationService;
 import org.umbrella.tracker.student.StudentService;
 import org.umbrella.tracker.student.StudentStatistics;
 
@@ -22,7 +23,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MainMenu {
     private StudentService studentService;
-    private StudentStatistics studentStatisticsImpl;
+    private StudentStatistics studentStatistics;
+    private StudentNotificationService studentNotificationService;
     private Logger LOGGER;
 
     /**
@@ -41,6 +43,7 @@ public class MainMenu {
                     case "find" -> findStudent(reader);
                     case "add points" -> addPoints(reader);
                     case "statistics" -> statistics(reader);
+                    case "notify" -> notifyStudents();
                     case "back" -> LOGGER.info("Enter 'exit' to exit the program.");
                     case "exit" -> Runtime.getRuntime().halt(0);
                     case "" -> LOGGER.info("No input.");
@@ -55,6 +58,11 @@ public class MainMenu {
         }
     }
 
+    private void notifyStudents() {
+        int notificationCount = studentNotificationService.sendNotification();
+        System.out.printf("Total %d students have been notified", notificationCount);
+    }
+
     /**
      * Displays the statistics menu and handles user interactions for course selection.
      *
@@ -63,7 +71,7 @@ public class MainMenu {
     private void statistics(BufferedReader reader) {
         try {
             LOGGER.info("Type the name of a course to see details or 'back' to quit:");
-            studentStatisticsImpl.printStatistics();
+            studentStatistics.printStatistics();
             String input;
 
             while (true) {
@@ -73,10 +81,10 @@ public class MainMenu {
                 }
 
                 switch (input) {
-                    case "java" -> studentStatisticsImpl.displayCourseInfo("Java");
-                    case "dsa" -> studentStatisticsImpl.displayCourseInfo("DSA");
-                    case "databases" -> studentStatisticsImpl.displayCourseInfo("Databases");
-                    case "spring" -> studentStatisticsImpl.displayCourseInfo("Spring");
+                    case "java" -> studentStatistics.displayCourseInfo("Java");
+                    case "dsa" -> studentStatistics.displayCourseInfo("DSA");
+                    case "databases" -> studentStatistics.displayCourseInfo("Databases");
+                    case "spring" -> studentStatistics.displayCourseInfo("Spring");
                     default -> LOGGER.error("Error: unknown command!");
                 }
             }
