@@ -1,20 +1,14 @@
 package org.umbrella.tracker.student;
 
-import com.google.inject.Inject;
 import lombok.*;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.umbrella.tracker.menu.MenuUtil;
 
 import java.util.*;
 
-@Getter
-@Setter
-@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class StudentServiceImpl implements StudentService {
 
-    @NonNull private final Logger LOGGER;
     private Map<Integer, Student> studentMap = new HashMap<>();
 
     /***
