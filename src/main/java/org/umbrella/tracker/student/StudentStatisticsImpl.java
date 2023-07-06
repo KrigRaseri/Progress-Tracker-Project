@@ -13,7 +13,8 @@ import java.util.function.Function;
  * The StudentStatistics class represents a set of statistics calculations and operations related to students and courses.
  * It provides methods to calculate various statistics, display course information, and print overall statistics.
  */
-@Data
+@Setter
+@Getter
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class StudentStatisticsImpl implements StudentStatistics{
